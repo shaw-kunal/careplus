@@ -404,3 +404,19 @@
 .PhoneInputInput::placeholder {
   color: #1a1d21;
 }
+
+.PhoneInputCountryIconImg{
+  width: 40px;
+  height: 40px;
+  margin: 4px;
+  border-radius: 10px;
+}
+.PhoneInputCountry{
+  background: var(--background);
+  display: flex;
+  width: fit-content;
+  width: 40%;
+}
+.PhoneInputCountrySelect{
+  width: 80%;
+}

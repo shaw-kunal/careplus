@@ -1,8 +1,19 @@
 import PatientForm from "@/components/forms/PatientForm";
 import Image from "next/image";
 import Link from "next/link";
+ const {
+  NEXT_PUBLIC_ENDPOINT: ENDPOINT,
+  PROJECT_ID,
+  API_KEY,
+  DATABASE_ID,
+  PATIENT_COLLECTION_ID,
+  DOCTOR_COLLECTION_ID,
+  APPOINTMENT_COLLECTION_ID,
+  NEXT_PUBLIC_BUCKET_ID: BUCKET_ID,
+} = process.env;
 
 export default function Home() {
+console.log(PROJECT_ID);
   return (
     <div className="flex h-screen max-h-screen">
       {/* TODO: OTP  verification | PASSKEY VERIFICATION*/}
