@@ -1,9 +1,9 @@
 import { ID, Query } from "node-appwrite"
-import { BUCKET_ID, DATABASE_ID, databases, ENDPOINT, PATIENT_COLLECTION_ID, PROJECT_ID, storage, users } from "../appwrite.config"
+import {   databases, ENDPOINT, storage, users } from "../appwrite.config"
 import { parseStringify } from "../utils";
 
 import { InputFile } from 'node-appwrite/file';
-import { BUILD_MANIFEST } from "next/dist/shared/lib/constants";
+import { DATABASE_ID, NEXT_PUBLIC_BUCKET_ID, PATIENT_COLLECTION_ID, PROJECT_ID } from "@/appwriteKey.config";
 
 export const createUser =  async (user:CreateUserParams) =>{
 
@@ -47,9 +47,10 @@ export const getUser = async (userId: string)=>{
 }
 
 
-// register action patien
+// register action patient
 export const registerPatient  = async( {identificationDocument, ...patient}:RegisterUserParams)=>{
-
+console.log("bucket id")
+console.log(NEXT_PUBLIC_BUCKET_ID)
     try {
         let file;
         
@@ -59,7 +60,7 @@ export const registerPatient  = async( {identificationDocument, ...patient}:Regi
                 identificationDocument.get('blob') as Blob,
                 identificationDocument.get('fileName') as string
             )
-           file = await storage.createFile(BUCKET_ID!,ID.unique(),inputFile)
+           file = await storage.createFile(NEXT_PUBLIC_BUCKET_ID!,ID.unique(),inputFile)
         }
 
         const newPatient = await databases.createDocument(
@@ -69,15 +70,19 @@ export const registerPatient  = async( {identificationDocument, ...patient}:Regi
             {
               identificationDocumentId: file?.$id ? file.$id : null,
               identificationDocumentUrl: file?.$id
-                ? `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${file.$id}/view??project=${PROJECT_ID}`
+                ? `${ENDPOINT}/storage/buckets/${NEXT_PUBLIC_BUCKET_ID}/files/${file.$id}/view??project=${PROJECT_ID}`
                 : null,
               ...patient,
             }
           );
 
+          return newPatient;
         
     } catch (error) {
-     
+        console.error("An error occurred while creating a new patient:", error);
+
     }
 
 }
+
+

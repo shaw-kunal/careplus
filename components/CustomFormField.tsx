@@ -62,8 +62,8 @@ const RenderField = ({ field, props }: { field: any; props: customeProps }) => {
           <FormControl>
             <Input
               placeholder={placeholder}
-              disabled={disabled}
               {...field}
+              disabled={disabled}
               className="shad-input border-0"
             />
           </FormControl>
@@ -175,6 +175,7 @@ const CustomFormField = (props: customeProps) => {
             <FormLabel>{label}</FormLabel>
           )}
           <RenderField field={field} props={props} />
+          <FormMessage className="text-orange-500 text-sm"/>
         </FormItem>
       )}
     />

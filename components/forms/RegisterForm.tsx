@@ -7,37 +7,97 @@ import { useForm } from "react-hook-form";
 import CustomFormField from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
 import { useState } from "react";
-import { formSchema, PatientFormValidation } from "@/lib/validation";
-import { createUser, registerPatient } from "@/lib/actions/patient.actions";
+import {  PatientFormValidation } from "@/lib/validation";
+import {  registerPatient } from "@/lib/actions/patient.actions";
 import { useRouter } from "next/navigation";
 import { FormFieldType, IdentificationTypes, PatientFormDefaultValues } from "@/costants";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Doctors, GenderOptions } from "@/costants";
 import { Label } from "@/components/ui/label";
-import { SelectItem } from "@radix-ui/react-select";
 import Image from "next/image";
-import FileUplaoder from "../FileUplaoder";
-import { setTime } from "react-datepicker/dist/date_utils";
+import { SelectItem } from "@/components/ui/select";
 
-const RegisterForm = ({ user }: { user: User | undefined }) => {
+import FileUplaoder from "../FileUplaoder";
+import { BUCKET_ID } from "@/lib/appwrite.config";
+
+const RegisterForm = ({ user }: { user: User  }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
 
-  const form = useForm<z.infer<typeof PatientFormValidation>>({
-    resolver: zodResolver(PatientFormValidation),
-    defaultValues: {
-      ...PatientFormDefaultValues,
-      name: user?.name,
-      email: user?.email,
-      phone: user?.phone
-    },
-  });
+      const form = useForm<z.infer<typeof PatientFormValidation>>({
+      resolver: zodResolver(PatientFormValidation),
+      defaultValues: {
+        ...PatientFormDefaultValues,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+      },
+    })
+  
+    
+    const onSubmit = async (values: z.infer<typeof PatientFormValidation>) => {
+      setIsLoading(true);
+  
+      // Store file info in form data as
+      let formData;
+      if (
+        values.identificationDocument &&
+        values.identificationDocument?.length > 0
+      ) {
+        const blobFile = new Blob([values.identificationDocument[0]], {
+          type: values.identificationDocument[0].type,
+        });
+  
+        formData = new FormData();
+        formData.append("blobFile", blobFile);
+        formData.append("fileName", values.identificationDocument[0].name);
+      }
+  
+      try {
+        const patient = {
+          userId: user.$id,
+          name: values.name,
+          email: values.email,
+          phone: values.phone,
+          birthDate: new Date(values.birthDate),
+          gender: values.gender,
+          address: values.address,
+          occupation: values.occupation,
+          emergencyContactName: values.emergencyContactName,
+          emergencyContactNumber: values.emergencyContactNumber,
+          primaryPhysician: values.primaryPhysician,
+          insuranceProvider: values.insuranceProvider,
+          insurancePolicyNumber: values.insurancePolicyNumber,
+          allergies: values.allergies,
+          currentMedication: values.currentMedication,
+          familyMedicalHistory: values.familyMedicalHistory,
+          pastMedicalHistory: values.pastMedicalHistory,
+          identificationType: values.identificationType,
+          identificationNumber: values.identificationNumber,
+          identificationDocument: values.identificationDocument
+            ? formData
+            : undefined,
+          privacyConsent:   values.privacyConsent,
+          disclosureConsent:values.disclosureConsent,
+          treatmentConsent: values.treatmentConsent
+        };
 
-
-  async function onSubmit(values: z.infer<typeof PatientFormValidation>) {
-   console.log(values);
-  }
+        const newPatient:any = await registerPatient(patient!);
+        console.log(newPatient)
+  
+        if (newPatient) {
+          router.push(`/patients/${user.$id}/new-appointment`);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      finally{
+        setIsLoading(false);
+      }
+        
+  
+    };
 
   return (
     <Form {...form}>
@@ -179,29 +239,29 @@ const RegisterForm = ({ user }: { user: User | undefined }) => {
         </section>
 
 
-        <CustomFormField
-          formFieldType={FormFieldType.SELECT}
-          control={form.control}
-          name="primaryPhysician"
-          label="Primary care physician"
-          placeholder="Select a physician"
-        >
-          {Doctors.map((doctor, i) => (
-            <SelectItem key={doctor.name + i} value={doctor.name}>
-              <div className="flex cursor-pointer items-center gap-2">
-                <Image
-                  src={doctor.image}
-                  width={32}
-                  height={32}
-                  alt="doctor"
-                  className="rounded-full border border-dark-500"
-                />
-                <p>{doctor.name}</p>
-              </div>
-            </SelectItem>
-          ))}
-        </CustomFormField>
-
+      {/* PRIMARY CARE PHYSICIAN */}
+      <CustomFormField
+            formFieldType={FormFieldType.SELECT}
+            control={form.control}
+            name="primaryPhysician"
+            label="Primary care physician"
+            placeholder="Select a physician"
+          >
+            {Doctors.map((doctor, i) => (
+              <SelectItem key={doctor.name + i} value={doctor.name}>
+                <div className="flex cursor-pointer items-center gap-2">
+                  <Image
+                    src={doctor.image}
+                    width={32}
+                    height={32}
+                    alt="doctor"
+                    className="rounded-full border border-dark-500"
+                  />
+                  <p>{doctor.name}</p>
+                </div>
+              </SelectItem>
+            ))}
+          </CustomFormField>
 
         <div className="flex flex-col gap-6 xl:flex-row w-ful">
           <div className="flex-1">
