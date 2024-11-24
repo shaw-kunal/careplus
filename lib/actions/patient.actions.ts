@@ -31,11 +31,6 @@ export const createUser =  async (user:CreateUserParams) =>{
      
 
 }
-
-
-
-
-
 // get user
 export const getUser = async (userId: string)=>{
     try {
@@ -85,4 +80,18 @@ console.log(NEXT_PUBLIC_BUCKET_ID)
 
 }
 
+
+
+export const getPatient = async(userId:string)=>{
+   try {
+    const patient = await databases.listDocuments(
+        DATABASE_ID,
+        PATIENT_COLLECTION_ID!,
+        [Query.equal('userId',userId)]
+    );
+    return parseStringify(patient.documents[0])
+   } catch (error) {
+    
+   }
+}
 

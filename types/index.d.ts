@@ -42,10 +42,10 @@ declare type SearchParamProps = {
     userId: string;
     patient: string;
     primaryPhysician: string;
-    reason: string;
+    reason?: string;
     schedule: Date;
     status: Status;
-    note: string | undefined;
+    notes: string | undefined;
   };
   
   declare type UpdateAppointmentParams = {
