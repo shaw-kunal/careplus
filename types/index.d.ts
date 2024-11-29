@@ -50,8 +50,8 @@ declare type SearchParamProps = {
   
   declare type UpdateAppointmentParams = {
     appointmentId: string;
-    userId: string;
+    userId?: string;
     appointment: Appointment;
-    type: string;
+    type?: string;
     timeZone?:string
   };

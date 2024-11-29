@@ -103,7 +103,7 @@ const RegisterForm = ({ user }: { user: User  }) => {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <div className="mb-12 space-y-4">
           <h1 className="header">Welcome {user?.name} 👋</h1>
-          <p className="text-dark-700">Let's us know more about yourself!</p>
+          <p className="text-dark-700">Let&apos;s us know more about yourself!</p>
         </div>
 
         <section className="space-y-6">

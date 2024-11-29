@@ -16,7 +16,6 @@ export const createUser =  async (user:CreateUserParams) =>{
     user.name
    );
 
-   console.log({newUser});
    return parseStringify(newUser)
     } 
     catch (error:any) {
@@ -26,7 +25,7 @@ export const createUser =  async (user:CreateUserParams) =>{
             ])
              return documents?.users[0];
          } 
-         console.log(error)
+         console.log(error);
     }
      
 
@@ -44,11 +43,6 @@ export const getUser = async (userId: string)=>{
 
 // register action patient
 export const registerPatient  = async( {identificationDocument, ...patient}:RegisterUserParams)=>{
-    console.log("BUCKET_ID",BUCKET_ID)
-    console.log("DATABASE_ID",DATABASE_ID)
-    console.log("ENDPOINT",ENDPOINT)
-    console.log("PATIENT_COLLECTION_ID",PATIENT_COLLECTION_ID)
-    console.log("PROJECT_ID",PROJECT_ID)
     try {
         let file;
         

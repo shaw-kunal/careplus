@@ -1,9 +1,9 @@
 'use server'
-import { APPOINTMENT_COLLECTION_ID, DATABASE_ID, databases } from "../appwrite.config";
-import { ID, Query } from "node-appwrite";
-import { revalidatePath } from "next/cache";
-import { parseStringify } from "../utils";
 import { Appointment } from "@/types/appwrite.types";
+import { revalidatePath } from "next/cache";
+import { ID, Query } from "node-appwrite";
+import { APPOINTMENT_COLLECTION_ID, DATABASE_ID, databases } from "../appwrite.config";
+import { parseStringify } from "../utils";
 
 export const createAppointment = async (
     appointmentData: CreateAppointmentParams
@@ -85,10 +85,9 @@ export const getRecentAppointmentList= async ()=>{
 
 export const updateAppointment = async ({
     appointmentId,
-    userId,
-    timeZone,
+
     appointment,
-    type
+
 }:UpdateAppointmentParams) =>{
   try {
     
