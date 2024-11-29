@@ -75,3 +75,9 @@ export function encryptKey(passkey: string) {
 export function decryptKey(passkey: string) {
   return atob(passkey);
 }
+export function toCapitalizeString(str:string){
+  return  str.trim().split(" ")
+         .map((item)=>item.charAt(0).toUpperCase() + item.slice(1))
+         .join("   ")
+   
+}

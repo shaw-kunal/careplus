@@ -1,22 +1,14 @@
 import PatientForm from "@/components/forms/PatientForm";
+import PasskeyModal from "@/components/PasskeyModal";
 import Image from "next/image";
 import Link from "next/link";
- const {
-  NEXT_PUBLIC_ENDPOINT: ENDPOINT,
-  PROJECT_ID,
-  API_KEY,
-  DATABASE_ID,
-  PATIENT_COLLECTION_ID,
-  DOCTOR_COLLECTION_ID,
-  APPOINTMENT_COLLECTION_ID,
-  NEXT_PUBLIC_BUCKET_ID: BUCKET_ID,
-} = process.env;
 
-export default function Home() {
-console.log(PROJECT_ID);
+export default function Home({searchParams}:SearchParamProps) {
+    const isAdmin = searchParams.admin === "true"
   return (
     <div className="flex h-screen max-h-screen">
       {/* TODO: OTP  verification | PASSKEY VERIFICATION*/}
+      {isAdmin && <PasskeyModal/>}
       <section className="remove-scrollbar container my-auto">
         <div className="sub-container max-w-[496px]">
           <Image

@@ -5,40 +5,45 @@ import { Form } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import CustomFormField from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { getAppointmentSchema } from "@/lib/validation";
 import { useRouter } from "next/navigation";
 import { Doctors, FormFieldType } from "@/costants";
 import { SelectItem } from "../ui/select";
 import Image from "next/image";
-import { createAppointment } from "@/lib/actions/appointment.action";
+import { createAppointment, updateAppointment} from "@/lib/actions/appointment.action";
+import { Appointment } from "@/types/appwrite.types";
 
 
 const AppointmentForm = ({
-    userId,patientId,type
+    userId,
+    patientId,
+    type,
+    setOpen,
+    appoinment
   }:{
     userId:string,
     patientId:string,
-    type:"create" | "cancel" | "schedule"
+    type:"create" | "cancel" | "schedule",
+    appoinment?:Appointment,
+    setOpen:Dispatch<SetStateAction<boolean>>
   }
 ) => {
+
   const router = useRouter();
   const [isLoading,setIsLoading] = useState<boolean>(false)
-
   const AppointmentFormValidation = getAppointmentSchema(type)
   const form = useForm<z.infer<typeof AppointmentFormValidation >>({
     resolver: zodResolver(AppointmentFormValidation),
     defaultValues: {
-      primaryPhysician:"",
-      schedule:new Date(),
-      notes:"",
-      reason:"",
-      cancellationReason:""
+      primaryPhysician:appoinment ?appoinment?.primaryPhysician:"",
+      schedule:appoinment? new Date(appoinment?.schedule): new Date(Date.now()),
+      notes:appoinment? appoinment.notes:"",
+      reason: appoinment?.reason|| "",
+      cancellationReason:appoinment?.cancellationReason|| ""
        },
   });
   
-
-
   async function onSubmit(values: z.infer<typeof AppointmentFormValidation>) {    
     setIsLoading(true);
     let status ;
@@ -54,7 +59,7 @@ const AppointmentForm = ({
     }
     try{
        if(type === "create" && patientId){
-      const appointmentData ={
+        const appointmentData ={
         userId,
         patient:patientId,
         primaryPhysician:values.primaryPhysician,
@@ -72,6 +77,24 @@ const AppointmentForm = ({
       };
 
        }
+       else{
+        const appointmentToUpdate={
+          userId,
+          appointmentId:appoinment?.$id!,
+          appointment:{
+            primaryPhysician: values.primaryPhysician,
+            schedule: new Date(values.schedule),
+            status: status as Status,
+            cancellationReason: values.cancellationReason,
+          },
+          type
+        }
+        const updatedAppointment = await updateAppointment(appointmentToUpdate)
+        if(updatedAppointment){
+          setOpen(false);
+          form.reset()
+        }
+      }
     }catch(err){
       console.log(err);
     }
@@ -84,10 +107,14 @@ const AppointmentForm = ({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <div className="mb-12 space-y-4">
-          <h1 className="header">New Appointment</h1>
-          <p className="text-dark-700">Request a new appointment in 10 sec</p>
-        </div>
+      {type === "create" && (
+          <section className="mb-12 space-y-4">
+            <h1 className="header">New Appointment</h1>
+            <p className="text-dark-700">
+              Request a new appointment in 10 seconds.
+            </p>
+          </section>
+        )}
 
         {
           type !== "cancel" && (
@@ -118,10 +145,10 @@ const AppointmentForm = ({
           <CustomFormField 
              formFieldType={FormFieldType.DATE_PICKER}
              control={form.control}
-             name="Schedule"
+             name="schedule"
              label="Expected appointment date"
              showTimeSelect
-             dateFormat="MM/dd/yyyy -h:mm aa"
+             dateFormat="MM/dd/yyyy - h:mm aa"
           />
           <div className="flex flex-col xl:flex-row gap-6">
            <div className="w-full">
@@ -156,8 +183,7 @@ const AppointmentForm = ({
            />
             )
           }
-
-              <SubmitButton isLoading={isLoading} className={`${type ==='cancel'?"shad-danger-btn":"shad-primary-btn"} w-full`} >{`${type.charAt(0).toUpperCase() + type.slice(1)} Appointment`}</SubmitButton>
+        <SubmitButton isLoading={isLoading} className={`${type ==='cancel'?"shad-danger-btn":"shad-primary-btn"} w-full`} >{`${type.charAt(0).toUpperCase() + type.slice(1)} Appointment`}</SubmitButton>
       </form>
     </Form>
   );
