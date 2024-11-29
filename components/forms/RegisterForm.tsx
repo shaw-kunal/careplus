@@ -18,7 +18,6 @@ import Image from "next/image";
 import { SelectItem } from "@/components/ui/select";
 
 import FileUplaoder from "../FileUplaoder";
-import { BUCKET_ID } from "@/lib/appwrite.config";
 
 const RegisterForm = ({ user }: { user: User  }) => {
   const router = useRouter();

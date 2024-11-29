@@ -1,9 +1,9 @@
+'use server'
 import { ID, Query } from "node-appwrite"
-import {   databases, ENDPOINT, storage, users } from "../appwrite.config"
+import {  BUCKET_ID, DATABASE_ID, databases, ENDPOINT, PATIENT_COLLECTION_ID, PROJECT_ID, storage, users } from "../appwrite.config"
 import { parseStringify } from "../utils";
 
 import { InputFile } from 'node-appwrite/file';
-import { DATABASE_ID, NEXT_PUBLIC_BUCKET_ID, PATIENT_COLLECTION_ID, PROJECT_ID } from "@/appwriteKey.config";
 
 export const createUser =  async (user:CreateUserParams) =>{
 
@@ -44,8 +44,11 @@ export const getUser = async (userId: string)=>{
 
 // register action patient
 export const registerPatient  = async( {identificationDocument, ...patient}:RegisterUserParams)=>{
-console.log("bucket id")
-console.log(NEXT_PUBLIC_BUCKET_ID)
+    console.log("BUCKET_ID",BUCKET_ID)
+    console.log("DATABASE_ID",DATABASE_ID)
+    console.log("ENDPOINT",ENDPOINT)
+    console.log("PATIENT_COLLECTION_ID",PATIENT_COLLECTION_ID)
+    console.log("PROJECT_ID",PROJECT_ID)
     try {
         let file;
         
@@ -55,7 +58,7 @@ console.log(NEXT_PUBLIC_BUCKET_ID)
                 identificationDocument.get('blob') as Blob,
                 identificationDocument.get('fileName') as string
             )
-           file = await storage.createFile(NEXT_PUBLIC_BUCKET_ID!,ID.unique(),inputFile)
+           file = await storage.createFile(BUCKET_ID!,ID.unique(),inputFile)
         }
 
         const newPatient = await databases.createDocument(
@@ -65,7 +68,7 @@ console.log(NEXT_PUBLIC_BUCKET_ID)
             {
               identificationDocumentId: file?.$id ? file.$id : null,
               identificationDocumentUrl: file?.$id
-                ? `${ENDPOINT}/storage/buckets/${NEXT_PUBLIC_BUCKET_ID}/files/${file.$id}/view??project=${PROJECT_ID}`
+                ? `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${file.$id}/view??project=${PROJECT_ID}`
                 : null,
               ...patient,
             }
@@ -85,7 +88,7 @@ console.log(NEXT_PUBLIC_BUCKET_ID)
 export const getPatient = async(userId:string)=>{
    try {
     const patient = await databases.listDocuments(
-        DATABASE_ID,
+        DATABASE_ID!,
         PATIENT_COLLECTION_ID!,
         [Query.equal('userId',userId)]
     );
